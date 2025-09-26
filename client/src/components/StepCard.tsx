@@ -10,6 +10,7 @@ interface StepCardProps {
   isCompleted?: boolean;
   isActive?: boolean;
   icon?: ReactNode;
+  image?: string;
   children?: ReactNode;
 }
 
@@ -20,6 +21,7 @@ export default function StepCard({
   isCompleted = false, 
   isActive = false,
   icon,
+  image,
   children 
 }: StepCardProps) {
   return (
@@ -79,6 +81,18 @@ export default function StepCard({
         <p className="text-sm text-muted-foreground leading-relaxed mb-4">
           {description}
         </p>
+        
+        {image && (
+          <div className="mb-4">
+            <img 
+              src={image} 
+              alt={`步驟 ${stepNumber}: ${title}`}
+              className="w-full max-w-md mx-auto rounded-lg border shadow-sm"
+              loading="lazy"
+            />
+          </div>
+        )}
+        
         {children}
       </CardContent>
     </Card>
