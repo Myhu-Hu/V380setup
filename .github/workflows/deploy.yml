@@ -1,0 +1,56 @@
+name: Deploy V380 Guide to GitHub Pages
+
+on:
+  # 當推送到 main 分支時觸發
+  push:
+    branches: ['main']
+  
+  # 允許手動觸發工作流程
+  workflow_dispatch:
+
+# 設定 GITHUB_TOKEN 權限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 只允許一個部署同時進行
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+jobs:
+  # 建構和部署工作
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 檢出代碼
+        uses: actions/checkout@v4
+        
+      - name: 設置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: 安裝相依套件
+        run: npm ci
+        
+      - name: 建構 V380 指南
+        run: npx vite build --config vite-github.config.ts
+        
+      - name: 設置 GitHub Pages
+        uses: actions/configure-pages@v4
+        
+      - name: 上傳建構檔案
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+          
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
